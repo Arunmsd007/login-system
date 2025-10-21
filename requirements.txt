@@ -1,0 +1,18 @@
+Flask
+pymongo
+PyJWT
+bcrypt
+python-dotenv
+certifi
+Flask-Cors
+gunicorn
+pytz
+
+
+# Flask: Our web framework for creating the API endpoints.
+
+# PyMongo: The official Python driver for MongoDB.
+
+# PyJWT: The library for encoding and decoding JSON Web Tokens.
+
+# bcrypt: A library for securely hashing and checking passwords.
