@@ -18,7 +18,6 @@
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         .welcome-check { width: 100px; height: 100px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; margin: 2rem auto; }
         .welcome-check svg { width: 50px; height: 50px; color: white; }
-        /* Password Strength Styles */
         #password-strength-meter { height: 5px; width: 0%; border-radius: 5px; transition: width 0.3s, background-color 0.3s; }
         .strength-weak { background-color: #f44336; width: 25%; }
         .strength-medium { background-color: #ff9800; width: 66%; }
@@ -31,16 +30,13 @@
 
     <div class="w-full max-w-2xl p-8 space-y-8 rounded-lg form-container">
         
-        <!-- Login View -->
         <div id="login-view">
             <h2 class="text-2xl font-bold text-center">Login to Your Account</h2>
             <form id="login-form" class="mt-8 space-y-6">
                 <input type="text" id="login-username" placeholder="Username" required class="w-full px-4 py-2 rounded-md form-input">
                 <div class="relative">
                     <input type="password" id="login-password" placeholder="Password" required class="w-full px-4 py-2 pr-10 rounded-md form-input">
-                    <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle">
-                        <!-- SVG icon will be inserted here -->
-                    </button>
+                    <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle"></button>
                 </div>
                 <button type="submit" class="w-full py-2 font-semibold text-white rounded-md form-button">Login</button>
             </form>
@@ -51,7 +47,6 @@
             </div>
         </div>
 
-        <!-- Register View -->
         <div id="register-view" class="hidden">
             <h2 class="text-2xl font-bold text-center">Create a New Account</h2>
             <form id="register-form" class="mt-8 space-y-6">
@@ -59,13 +54,9 @@
                 <div>
                     <div class="relative">
                         <input type="password" id="register-password" placeholder="Password" required class="w-full px-4 py-2 pr-10 rounded-md form-input">
-                        <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle">
-                            <!-- SVG icon will be inserted here -->
-                        </button>
+                        <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle"></button>
                     </div>
-                    <div class="mt-2 bg-gray-700 rounded-full">
-                        <div id="password-strength-meter"></div>
-                    </div>
+                    <div class="mt-2 bg-gray-700 rounded-full"><div id="password-strength-meter"></div></div>
                     <p id="password-strength-text" class="mt-1 text-xs text-gray-400"></p>
                 </div>
                 <button type="submit" class="w-full py-2 font-semibold text-white rounded-md form-button">Register</button>
@@ -74,16 +65,13 @@
             <p class="mt-4 text-center">Already have an account? <a href="#" class="font-semibold switch-link show-login-link">Login here</a></p>
         </div>
 
-        <!-- Forgot Password View -->
         <div id="forgot-password-view" class="hidden">
             <h2 class="text-2xl font-bold text-center">Reset Your Password</h2>
             <form id="forgot-password-form" class="mt-8 space-y-6">
                 <input type="text" id="forgot-username" placeholder="Enter your username" required class="w-full px-4 py-2 rounded-md form-input">
                 <div class="relative">
                      <input type="password" id="forgot-new-password" placeholder="Enter new password" required class="w-full px-4 py-2 pr-10 rounded-md form-input">
-                     <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle">
-                        <!-- SVG icon will be inserted here -->
-                    </button>
+                     <button type="button" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 password-toggle"></button>
                 </div>
                 <button type="submit" class="w-full py-2 font-semibold text-white rounded-md form-button">Reset Password</button>
             </form>
@@ -91,7 +79,6 @@
             <p class="mt-4 text-center"><a href="#" class="font-semibold switch-link show-login-link">Back to Login</a></p>
         </div>
 
-        <!-- Welcome View (for normal users) -->
         <div id="welcome-view" class="hidden text-center fade-in">
             <div class="welcome-check">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -101,7 +88,6 @@
             <button id="logout-button" class="w-full max-w-xs py-2 mx-auto mt-8 font-semibold text-white bg-red-600 rounded-md hover:bg-red-700">Logout</button>
         </div>
         
-        <!-- Admin Dashboard View -->
         <div id="admin-dashboard-view" class="hidden">
             <div class="flex items-center justify-between">
                 <h2 class="text-2xl font-bold">Admin Dashboard</h2>
@@ -121,11 +107,12 @@
             const views = { login: document.getElementById('login-view'), register: document.getElementById('register-view'), forgot: document.getElementById('forgot-password-view'), welcome: document.getElementById('welcome-view'), admin: document.getElementById('admin-dashboard-view') };
             const forms = { login: document.getElementById('login-form'), register: document.getElementById('register-form'), forgot: document.getElementById('forgot-password-form') };
             const messages = { login: document.getElementById('login-message'), register: document.getElementById('register-message'), forgot: document.getElementById('forgot-message'), welcome: document.getElementById('welcome-message') };
+            
             const API_URL = 'https://login-system-7t50.onrender.com';
             
             function showView(viewName) { Object.values(views).forEach(v => v.classList.add('hidden')); if(views[viewName]) views[viewName].classList.remove('hidden'); }
             
-            setupPasswordToggles(); // Initialize password visibility toggles
+            setupPasswordToggles();
 
             document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); showView('register'); });
             document.getElementById('show-forgot-password-link').addEventListener('click', (e) => { e.preventDefault(); showView('forgot'); });
@@ -144,8 +131,8 @@
                 if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
                 strengthMeter.className = '';
                 switch (score) {
-                    case 1: case 2: strengthMeter.classList.add('strength-weak'); strengthText.textContent = 'Weak. Consider adding numbers, symbols, or uppercase letters.'; break;
-                    case 3: strengthMeter.classList.add('strength-medium'); strengthText.textContent = 'Medium. Good, but could be stronger.'; break;
+                    case 1: case 2: strengthMeter.classList.add('strength-weak'); strengthText.textContent = 'Weak. Add more variety.'; break;
+                    case 3: strengthMeter.classList.add('strength-medium'); strengthText.textContent = 'Medium. Almost there!'; break;
                     case 4: strengthMeter.classList.add('strength-strong'); strengthText.textContent = 'Strong password!'; break;
                     default: strengthText.textContent = '';
                 }
@@ -154,7 +141,6 @@
             function setupPasswordToggles() {
                 const eyeIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
                 const eyeSlashIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>`;
-
                 document.querySelectorAll('.password-toggle').forEach(button => {
                     const passwordInput = button.previousElementSibling;
                     button.innerHTML = eyeIcon;
@@ -295,6 +281,4 @@
     </script>
 </body>
 </html>
-
-
 
