@@ -28,6 +28,7 @@ IST = pytz.timezone('Asia/Kolkata')
 
 # --- Database Connection ---
 try:
+    # CRITICAL FIX: Use certifi to handle SSL certificates
     client = pymongo.MongoClient(MONGO_URI, tlsCAFile=certifi.where())
     db = client.get_database()
     users_collection = db.users
@@ -37,7 +38,7 @@ except Exception as e:
     print(f"❌ Failed to connect to the database: {e}")
     client = None
 
-# --- JWT Decorator for Admin Routes ---
+# --- JWT Decorator ---
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -49,13 +50,12 @@ def token_required(f):
             current_user = users_collection.find_one({'username': data['username']})
             if not current_user or current_user.get('role') != 'admin':
                 return jsonify({'error': 'Admin privileges required'}), 403
-        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+        except Exception:
             return jsonify({'error': 'Token is invalid or expired'}), 401
         return f(current_user, *args, **kwargs)
     return decorated
 
 # --- API Endpoints ---
-
 @app.route('/register', methods=['POST'])
 def register():
     if not client: return jsonify({"error": "Database connection failed"}), 500
@@ -90,21 +90,15 @@ def logout():
     data = request.get_json()
     session_id = data.get('session_id')
     if session_id:
-        try:
-            sessions_collection.update_one(
-                {'_id': ObjectId(session_id)}, {'$set': {'logout_time': datetime.now(timezone.utc)}}
-            )
-        except Exception:
-            # Fails silently if session_id is invalid, which is acceptable for logout
-            pass
+        sessions_collection.update_one(
+            {'_id': ObjectId(session_id)}, {'$set': {'logout_time': datetime.now(timezone.utc)}}
+        )
     return jsonify({"message": "Logout successful"}), 200
 
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
     username, new_password = data.get('username'), data.get('new_password')
-    if not username or not new_password:
-        return jsonify({'error': 'Username and new password are required'}), 400
     user = users_collection.find_one({'username': username})
     if not user: return jsonify({'error': 'Username not found'}), 404
     hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
