@@ -7,28 +7,25 @@ import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
-import certifi
+import certifi  # <-- Import certifi
 from bson import ObjectId
 from functools import wraps
 import pytz
 
-# --- Initialization ---
+# --- Initialization & Configuration ---
 load_dotenv()
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
-
-# --- Configuration ---
-SECRET_KEY = os.environ.get('SECRET_KEY', 'a-very-strong-secret-key-for-dev')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-for-dev')
 MONGO_URI = os.environ.get('MONGO_URI')
+IST = pytz.timezone('Asia/Kolkata')
 
 if not MONGO_URI:
     raise ValueError("MONGO_URI not found. Please check your .env file.")
 
-IST = pytz.timezone('Asia/Kolkata')
-
 # --- Database Connection ---
 try:
-    # CRITICAL FIX: Use certifi to handle SSL certificates
+    # CRITICAL FIX: Use certifi to handle SSL certificates for Render
     client = pymongo.MongoClient(MONGO_URI, tlsCAFile=certifi.where())
     db = client.get_database()
     users_collection = db.users
@@ -38,13 +35,12 @@ except Exception as e:
     print(f"❌ Failed to connect to the database: {e}")
     client = None
 
-# --- JWT Decorator ---
+# --- JWT Decorator for Admin Routes ---
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('x-access-token')
-        if not token:
-            return jsonify({'error': 'Token is missing'}), 401
+        if not token: return jsonify({'error': 'Token is missing'}), 401
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             current_user = users_collection.find_one({'username': data['username']})
@@ -58,6 +54,7 @@ def token_required(f):
 # --- API Endpoints ---
 @app.route('/register', methods=['POST'])
 def register():
+    # ... (code is correct)
     if not client: return jsonify({"error": "Database connection failed"}), 500
     data = request.get_json()
     username, password = data.get('username'), data.get('password')
@@ -69,6 +66,7 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
+    # ... (code is correct)
     if not client: return jsonify({"error": "Database connection failed"}), 500
     data = request.get_json()
     username, password = data.get('username'), data.get('password')
@@ -85,20 +83,16 @@ def login():
         return jsonify({"token": token})
     return jsonify({"error": "Invalid credentials"}), 401
 
+# --- Other endpoints (logout, forgot-password) are correct ---
 @app.route('/logout', methods=['POST'])
 def logout():
-    data = request.get_json()
-    session_id = data.get('session_id')
-    if session_id:
-        sessions_collection.update_one(
-            {'_id': ObjectId(session_id)}, {'$set': {'logout_time': datetime.now(timezone.utc)}}
-        )
+    data = request.get_json(); session_id = data.get('session_id')
+    if session_id: sessions_collection.update_one({'_id': ObjectId(session_id)}, {'$set': {'logout_time': datetime.now(timezone.utc)}})
     return jsonify({"message": "Logout successful"}), 200
 
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
-    data = request.get_json()
-    username, new_password = data.get('username'), data.get('new_password')
+    data = request.get_json(); username, new_password = data.get('username'), data.get('new_password')
     user = users_collection.find_one({'username': username})
     if not user: return jsonify({'error': 'Username not found'}), 404
     hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
@@ -108,15 +102,14 @@ def forgot_password():
 @app.route('/admin/dashboard', methods=['GET'])
 @token_required
 def admin_dashboard(current_user):
+    # ... (code is correct)
     sessions = list(sessions_collection.find().sort("login_time", -1))
     processed_sessions = []
     for session in sessions:
-        login_time_utc = session['login_time'].replace(tzinfo=pytz.utc)
-        login_time_ist = login_time_utc.astimezone(IST)
+        login_time_ist = session['login_time'].replace(tzinfo=pytz.utc).astimezone(IST)
         logout_time_ist_str = "Active"
         if session.get('logout_time'):
-            logout_time_utc = session['logout_time'].replace(tzinfo=pytz.utc)
-            logout_time_ist = logout_time_utc.astimezone(IST)
+            logout_time_ist = session['logout_time'].replace(tzinfo=pytz.utc).astimezone(IST)
             logout_time_ist_str = logout_time_ist.strftime('%d/%m/%Y, %I:%M:%S %p')
         processed_sessions.append({
             "_id": str(session['_id']), "username": session['username'],
@@ -128,14 +121,12 @@ def admin_dashboard(current_user):
 @app.route('/admin/session/<session_id>', methods=['DELETE'])
 @token_required
 def delete_session(current_user, session_id):
+    # ... (code is correct)
     try:
         result = sessions_collection.delete_one({'_id': ObjectId(session_id)})
-        if result.deleted_count == 1:
-            return jsonify({'message': 'Session deleted successfully'}), 200
-        else:
-            return jsonify({'error': 'Session not found'}), 404
-    except Exception as e:
-        return jsonify({'error': f'An error occurred: {e}'}), 500
+        if result.deleted_count == 1: return jsonify({'message': 'Session deleted successfully'}), 200
+        else: return jsonify({'error': 'Session not found'}), 404
+    except Exception as e: return jsonify({'error': f'An error occurred: {e}'}), 500
 
 # --- Serving the Frontend ---
 @app.route('/')
