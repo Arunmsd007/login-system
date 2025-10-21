@@ -121,7 +121,7 @@
             const views = { login: document.getElementById('login-view'), register: document.getElementById('register-view'), forgot: document.getElementById('forgot-password-view'), welcome: document.getElementById('welcome-view'), admin: document.getElementById('admin-dashboard-view') };
             const forms = { login: document.getElementById('login-form'), register: document.getElementById('register-form'), forgot: document.getElementById('forgot-password-form') };
             const messages = { login: document.getElementById('login-message'), register: document.getElementById('register-message'), forgot: document.getElementById('forgot-message'), welcome: document.getElementById('welcome-message') };
-            const API_URL = 'https://login-system-7t50.onrender.com/';
+            const API_URL = 'https://login-system-7t50.onrender.com';
             
             function showView(viewName) { Object.values(views).forEach(v => v.classList.add('hidden')); if(views[viewName]) views[viewName].classList.remove('hidden'); }
             
@@ -295,5 +295,6 @@
     </script>
 </body>
 </html>
+
 
 
