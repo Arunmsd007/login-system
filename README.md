@@ -2,7 +2,7 @@ Secure Authentication System with Flask and MongoDB
 
 This is a full-stack web application demonstrating a secure, feature-rich authentication and session management system. It features a Python backend built with Flask and a modern, responsive frontend built with HTML, Tailwind CSS, and vanilla JavaScript.
 
-Live Demo: https://login-system-7t50.onrender.com/
+Live Demo: https://login-system-7t50.onrender.com
 
 📋 Project Outcome
 
